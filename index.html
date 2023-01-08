@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Get some help while playing wordle, for a better wordle"
+    />
+    <meta name="keywords" content="wordle, game, help wordle" />
+    <meta name="author" content="Rizwan Khan" />
+    <title>For a better wordle</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      div:nth-child(2) input[type="text"] {
+        max-width: 32px;
+      }
+      #tryWords {
+        max-height: 200px;
+        overflow: auto;
+      }
+      #possibleWords {
+        max-height: 200px;
+        overflow: auto;
+      }
+      .howto {
+        right: 62px;
+        top: 16px;
+      }
+      .howto img {
+        height: 32px;
+      }
+      .credits img {
+        height: 56px;
+      }
+    </style>
+  </head>
+  <body class="container">
+    <h5 class="mt-3">For a better wordle</h5>
+    <div class="d-flex justify-content-center mb-2 mt-2">
+      <input type="checkbox" checked id="nin1" /><input
+        type="text"
+        maxlength="1"
+        id="in1"
+        class="me-2"
+      />
+      <input type="checkbox" checked id="nin2" /><input
+        type="text"
+        maxlength="1"
+        id="in2"
+        class="me-2"
+      />
+      <input type="checkbox" checked id="nin3" /><input
+        type="text"
+        maxlength="1"
+        id="in3"
+        class="me-2"
+      />
+      <input type="checkbox" checked id="nin4" /><input
+        type="text"
+        maxlength="1"
+        id="in4"
+        class="me-2"
+      />
+      <input type="checkbox" checked id="nin5" /><input
+        type="text"
+        maxlength="1"
+        id="in5"
+      />
+    </div>
+    <div class="d-flex justify-content-center mb-2">
+      <label for="have">Have letters</label>
+      <input type="text" maxlength="5" id="have" class="ms-2" />
+    </div>
+    <div class="d-flex justify-content-center mb-2">
+      <label for="nothave">Don't have letters</label>
+      <input type="text" maxlength="30" id="nothave" class="ms-2" />
+    </div>
+    <h6>Words to try</h6>
+    <div id="tryWords"></div>
+    <h6 class="mt-4 mb-1">Possible words</h6>
+    <div id="possibleWords"></div>
+    <div class="position-absolute howto">
+      <a href="" target="_blank"
+        ><img
+          alt="How to"
+          src="https://raw.githubusercontent.com/rizz-wan/utils/main/howto.png"
+      /></a>
+    </div>
+    <div class="position-absolute top-0 end-0 credits" title="Rizwan">
+      <a href="https://www.irizwan.com" target="_blank"
+        ><img
+          alt="Rizwan"
+          src="https://raw.githubusercontent.com/rizz-wan/utils/main/signature.png"
+      /></a>
+    </div>
+  </body>
+  <script src="index.js"></script>
+</html>
