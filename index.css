@@ -1,0 +1,23 @@
+div:nth-child(2) input[type="text"] {
+  max-width: 32px;
+}
+#possibleWords,
+#tryWords {
+  max-height: 200px;
+  overflow: auto;
+  border-bottom: 1px solid #ccc;
+}
+.howto {
+  right: 62px;
+  top: 16px;
+}
+.howto img {
+  height: 32px;
+}
+.credits img {
+  height: 56px;
+}
+input {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}

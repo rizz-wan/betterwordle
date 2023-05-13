@@ -6452,3 +6452,5 @@ function filterWords() {
     .toString()
     .replaceAll(",", " ");
 }
+document.getElementById("test").innerText =
+  main.words[Math.floor(Math.random() * (main.words.length - 1 - 0 + 1) + 0)];
