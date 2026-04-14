@@ -6374,6 +6374,14 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+const inputs = [
+  { el: in1, neg: nin1 },
+  { el: in2, neg: nin2 },
+  { el: in3, neg: nin3 },
+  { el: in4, neg: nin4 },
+  { el: in5, neg: nin5 },
+];
+
 document.addEventListener("keyup", (e) => {
   if (
     e.target &&
@@ -6402,73 +6410,147 @@ document.addEventListener("change", (e) => {
   }
 });
 
+function getLetterFrequency(words) {
+  const freq = {};
+  for (const word of words) {
+    const seen = new Set(word.toLowerCase());
+    for (const ch of seen) {
+      freq[ch] = (freq[ch] || 0) + 1;
+    }
+  }
+  return freq;
+}
+
+function scoreByFrequency(word, freq) {
+  const seen = new Set(word.toLowerCase());
+  let score = 0;
+  for (const ch of seen) {
+    score += freq[ch] || 0;
+  }
+  return score;
+}
+
 function filterWords() {
-  let filteredWords = [];
-  let filteredWords2 = [];
-  let notRequiredWords = [];
-  const pos1 =
-    in1.value !== "" ? (!nin1.checked ? `^${escapeRegex(in1.value)}` : escapeRegex(in1.value)) : "a-z";
-  const pos2 =
-    in2.value !== "" ? (!nin2.checked ? `^${escapeRegex(in2.value)}` : escapeRegex(in2.value)) : "a-z";
-  const pos3 =
-    in3.value !== "" ? (!nin3.checked ? `^${escapeRegex(in3.value)}` : escapeRegex(in3.value)) : "a-z";
-  const pos4 =
-    in4.value !== "" ? (!nin4.checked ? `^${escapeRegex(in4.value)}` : escapeRegex(in4.value)) : "a-z";
-  const pos5 =
-    in5.value !== "" ? (!nin5.checked ? `^${escapeRegex(in5.value)}` : escapeRegex(in5.value)) : "a-z";
+  // Collect yellow letters automatically (entered in position but Exact unchecked)
+  const yellowConstraints = []; // { letter, position }
+  const greenLetters = new Set();
 
-  const reg = `([${pos1}][${pos2}][${pos3}][${pos4}][${pos5}])`;
-  const re = new RegExp(reg, "gi");
-
-  main.words.forEach((word) => {
-    const tmpWord = word.match(re)?.[0];
-    if (tmpWord) filteredWords.push(tmpWord);
+  inputs.forEach((input, idx) => {
+    const val = input.el.value.toLowerCase();
+    if (val) {
+      if (!input.neg.checked) {
+        yellowConstraints.push({ letter: val, position: idx });
+      } else {
+        greenLetters.add(val);
+      }
+    }
   });
 
-  const notHaveLetters = nothave.value?.split("").filter((n) => n);
-  if (notHaveLetters.length) {
-    filteredWords.forEach((filterWord) => {
-      notHaveLetters.forEach((notHaveLetter) => {
-        if (filterWord.includes(notHaveLetter)) {
-          notRequiredWords.push(filterWord);
-          return;
-        }
-      });
-    });
-  }
-  filteredWords = filteredWords.filter((n) => !notRequiredWords.includes(n));
+  const autoContains = yellowConstraints.map((c) => c.letter);
+  const manualContains = have.value
+    ? have.value.toLowerCase().split("").filter(Boolean)
+    : [];
+  const allContains = [...new Set([...autoContains, ...manualContains])];
 
-  const haveLetters = have.value?.split("").filter((n) => n);
-  if (haveLetters.length) {
-    filteredWords.forEach((filterWord) => {
-      let hasletter = true;
-      haveLetters.forEach((haveLetter) => {
-        if (!filterWord.includes(haveLetter)) {
-          hasletter = false;
-          return;
-        }
-      });
-      if (!hasletter) filteredWords2.push(filterWord);
-    });
-  }
-  const tryArr = filteredWords2;
-  const possibleArr = filteredWords.filter((n) => !filteredWords2.includes(n));
+  const excludeLetters = nothave.value
+    ? nothave.value.toLowerCase().split("").filter(Boolean)
+    : [];
 
-  renderWords(tryWords, tryArr);
+  // Build position regex
+  const posPatterns = inputs.map((input) => {
+    if (input.el.value !== "") {
+      const escaped = escapeRegex(input.el.value);
+      return input.neg.checked ? escaped : `^${escaped}`;
+    }
+    return "a-z";
+  });
+  const re = new RegExp(
+    `^[${posPatterns[0]}][${posPatterns[1]}][${posPatterns[2]}][${posPatterns[3]}][${posPatterns[4]}]$`,
+    "i"
+  );
+
+  // Filter: position match + contains + excludes (with overlap handling)
+  const possibleArr = main.words.filter((word) => {
+    const w = word.toLowerCase();
+    if (!re.test(w)) return false;
+
+    // Exclude letters that are gray — but if a letter is ALSO in contains,
+    // it means the letter exists in the word (yellow+gray = limited count).
+    // Keep the word if it contains that letter (contains takes priority).
+    for (const letter of excludeLetters) {
+      if (w.includes(letter) && !allContains.includes(letter)) return false;
+    }
+
+    // Must contain all required letters
+    for (const letter of allContains) {
+      if (!w.includes(letter)) return false;
+    }
+
+    return true;
+  });
+
+  // Rank possible words by letter frequency within the remaining set.
+  // Words with common letters appear first — they're more likely answers.
+  const freq = getLetterFrequency(possibleArr);
+  possibleArr.sort((a, b) => scoreByFrequency(b, freq) - scoreByFrequency(a, freq));
+
+  // --- Strategic "Words to Try" ---
+  // Find letters that are common in possible words but haven't been tested yet.
+  const knownLetters = new Set([...allContains, ...excludeLetters]);
+  for (const letter of greenLetters) knownLetters.add(letter);
+
+  const unknownFreq = {};
+  for (const word of possibleArr) {
+    const seen = new Set(word.toLowerCase());
+    for (const ch of seen) {
+      if (!knownLetters.has(ch)) {
+        unknownFreq[ch] = (unknownFreq[ch] || 0) + 1;
+      }
+    }
+  }
+
+  const hasUnknowns = Object.keys(unknownFreq).length > 0;
+
+  // Score all dictionary words by how many high-value unknown letters they test
+  let tryArr = [];
+  if (hasUnknowns && possibleArr.length > 1) {
+    const possibleSet = new Set(possibleArr);
+    const scored = [];
+    for (const word of main.words) {
+      if (possibleSet.has(word)) continue;
+      const seen = new Set(word.toLowerCase());
+      let score = 0;
+      let unknownHits = 0;
+      for (const ch of seen) {
+        if (unknownFreq[ch]) {
+          score += unknownFreq[ch];
+          unknownHits++;
+        }
+      }
+      if (unknownHits >= 2) scored.push({ word, score });
+    }
+    scored.sort((a, b) => b.score - a.score);
+    tryArr = scored.slice(0, 60).map((item) => item.word);
+  }
+
   renderWords(possibleWords, possibleArr);
+  renderWords(tryWords, tryArr);
 
-  tryCount.textContent = tryArr.length;
   possibleCount.textContent = possibleArr.length;
+  tryCount.textContent = tryArr.length;
 }
 
 function renderWords(container, words) {
   container.innerHTML = "";
-  words.forEach((word) => {
+  const frag = document.createDocumentFragment();
+  for (const word of words) {
     const span = document.createElement("span");
     span.className = "word-badge";
     span.textContent = word;
-    container.appendChild(span);
-  });
+    frag.appendChild(span);
+  }
+  container.appendChild(frag);
 }
+
 document.getElementById("test").innerText =
-  main.words[Math.floor(Math.random() * (main.words.length - 1 - 0 + 1) + 0)];
+  main.words[Math.floor(Math.random() * main.words.length)];
