@@ -10,96 +10,159 @@
     />
     <meta name="keywords" content="wordle, game, wordle solver" />
     <meta name="author" content="Rizwan Khan" />
-    <title>For a better wordle</title>
+    <title>Better Wordle</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link href="./index.css" rel="stylesheet" />
   </head>
-  <body class="container">
-    <h5 class="mt-3">For a better wordle</h5>
-    <div class="d-flex justify-content-center mb-2 mt-2">
-      <input type="checkbox" checked id="nin1" /><input
-        type="text"
-        maxlength="1"
-        id="in1"
-        class="me-2"
-        autocomplete="off"
-      />
-      <input type="checkbox" checked id="nin2" /><input
-        type="text"
-        maxlength="1"
-        id="in2"
-        class="me-2"
-        autocomplete="off"
-      />
-      <input type="checkbox" checked id="nin3" /><input
-        type="text"
-        maxlength="1"
-        id="in3"
-        class="me-2"
-        autocomplete="off"
-      />
-      <input type="checkbox" checked id="nin4" /><input
-        type="text"
-        maxlength="1"
-        id="in4"
-        class="me-2"
-        autocomplete="off"
-      />
-      <input type="checkbox" checked id="nin5" /><input
-        type="text"
-        maxlength="1"
-        id="in5"
-        autocomplete="off"
-      />
+  <body>
+    <div class="app-container">
+      <header>
+        <h1 class="app-title">Better Wordle</h1>
+        <p class="app-subtitle">Your Wordle companion</p>
+        <div class="header-links">
+          <a
+            href="https://github.com/rizz-wan/betterwordle#how-to-use"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="header-link"
+            title="How to use"
+          >?</a>
+          <a
+            href="https://www.irizwan.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="header-link credits-link"
+            title="Rizwan"
+          >
+            <img
+              alt="Rizwan"
+              src="https://raw.githubusercontent.com/rizz-wan/utils/main/signature.png"
+            />
+          </a>
+        </div>
+      </header>
+
+      <section class="card-section">
+        <h2 class="section-title">Known Positions</h2>
+        <p class="section-hint">Enter letters. Uncheck if the letter is NOT in that position.</p>
+        <div class="position-grid">
+          <div class="position-cell">
+            <span class="pos-label">1</span>
+            <input
+              type="text"
+              maxlength="1"
+              id="in1"
+              class="pos-input"
+              autocomplete="off"
+            />
+            <label class="toggle-label" for="nin1">
+              <input type="checkbox" checked id="nin1" />
+              <span class="toggle-text">Exact</span>
+            </label>
+          </div>
+          <div class="position-cell">
+            <span class="pos-label">2</span>
+            <input
+              type="text"
+              maxlength="1"
+              id="in2"
+              class="pos-input"
+              autocomplete="off"
+            />
+            <label class="toggle-label" for="nin2">
+              <input type="checkbox" checked id="nin2" />
+              <span class="toggle-text">Exact</span>
+            </label>
+          </div>
+          <div class="position-cell">
+            <span class="pos-label">3</span>
+            <input
+              type="text"
+              maxlength="1"
+              id="in3"
+              class="pos-input"
+              autocomplete="off"
+            />
+            <label class="toggle-label" for="nin3">
+              <input type="checkbox" checked id="nin3" />
+              <span class="toggle-text">Exact</span>
+            </label>
+          </div>
+          <div class="position-cell">
+            <span class="pos-label">4</span>
+            <input
+              type="text"
+              maxlength="1"
+              id="in4"
+              class="pos-input"
+              autocomplete="off"
+            />
+            <label class="toggle-label" for="nin4">
+              <input type="checkbox" checked id="nin4" />
+              <span class="toggle-text">Exact</span>
+            </label>
+          </div>
+          <div class="position-cell">
+            <span class="pos-label">5</span>
+            <input
+              type="text"
+              maxlength="1"
+              id="in5"
+              class="pos-input"
+              autocomplete="off"
+            />
+            <label class="toggle-label" for="nin5">
+              <input type="checkbox" checked id="nin5" />
+              <span class="toggle-text">Exact</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section">
+        <div class="letter-filters">
+          <div class="filter-group">
+            <label for="have" class="filter-label have-label">Contains</label>
+            <input
+              type="text"
+              maxlength="5"
+              id="have"
+              class="filter-input"
+              autocomplete="off"
+              placeholder="e.g. ae"
+            />
+          </div>
+          <div class="filter-group">
+            <label for="nothave" class="filter-label nothave-label">Excludes</label>
+            <input
+              type="text"
+              maxlength="30"
+              id="nothave"
+              class="filter-input"
+              autocomplete="off"
+              placeholder="e.g. rst"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="card-section suggestion-section">
+        <p class="starter-word">Try starting with: <strong id="test"></strong></p>
+      </section>
+
+      <section class="card-section results-section">
+        <div class="results-panel">
+          <h2 class="section-title">Possible Words <span class="word-count" id="possibleCount"></span></h2>
+          <div id="possibleWords" class="word-grid"></div>
+        </div>
+        <div class="results-panel">
+          <h2 class="section-title">Words to Try <span class="word-count" id="tryCount"></span></h2>
+          <div id="tryWords" class="word-grid"></div>
+        </div>
+      </section>
     </div>
-    <div class="d-flex justify-content-center mb-2">
-      <label for="have">Have letters</label>
-      <input
-        type="text"
-        maxlength="5"
-        id="have"
-        class="ms-2"
-        autocomplete="off"
-      />
-    </div>
-    <div class="d-flex justify-content-center mb-2">
-      <label for="nothave">Don't have letters</label>
-      <input
-        type="text"
-        maxlength="30"
-        id="nothave"
-        class="ms-2"
-        autocomplete="off"
-      />
-    </div>
-    <span
-      >Let's start by:
-      <b
-        ><u><span id="test"></span></u></b
-    ></span>
-    <h6>Possible words</h6>
-    <div id="possibleWords"></div>
-    <h6 class="mt-4 mb-1">Words to try</h6>
-    <div id="tryWords"></div>
-    <div class="position-absolute howto">
-      <a
-        href="https://github.com/rizz-wan/betterwordle#how-to-use"
-        target="_blank"
-        ><img
-          alt="How to"
-          src="https://raw.githubusercontent.com/rizz-wan/utils/main/howto.png"
-      /></a>
-    </div>
-    <div class="position-absolute top-0 end-0 credits" title="Rizwan">
-      <a href="https://www.irizwan.com" target="_blank"
-        ><img
-          alt="Rizwan"
-          src="https://raw.githubusercontent.com/rizz-wan/utils/main/signature.png"
-      /></a>
-    </div>
+    <script src="index.js"></script>
   </body>
-  <script src="index.js"></script>
-</html>

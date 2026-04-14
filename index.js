@@ -40,7 +40,7 @@ const main = {
     "agree",
     "attry",
     "adure",
-    "a b c",
+
     "appui",
     "amigo",
     "arval",
@@ -332,7 +332,7 @@ const main = {
     "adopt",
     "amaze",
     "areng",
-    "a-sea",
+
     "ation",
     "almug",
     "aboma",
@@ -6366,7 +6366,13 @@ const in1 = document.getElementById("in1"),
   nothave = document.getElementById("nothave"),
   have = document.getElementById("have"),
   tryWords = document.getElementById("tryWords"),
-  possibleWords = document.getElementById("possibleWords");
+  possibleWords = document.getElementById("possibleWords"),
+  possibleCount = document.getElementById("possibleCount"),
+  tryCount = document.getElementById("tryCount");
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 document.addEventListener("keyup", (e) => {
   if (
@@ -6400,19 +6406,19 @@ function filterWords() {
   let filteredWords = [];
   let filteredWords2 = [];
   let notRequiredWords = [];
-  pos1 =
-    in1.value !== "" ? (!nin1.checked ? `^${in1.value}` : in1.value) : "a-z";
-  pos2 =
-    in2.value !== "" ? (!nin2.checked ? `^${in2.value}` : in2.value) : "a-z";
-  pos3 =
-    in3.value !== "" ? (!nin3.checked ? `^${in3.value}` : in3.value) : "a-z";
-  pos4 =
-    in4.value !== "" ? (!nin4.checked ? `^${in4.value}` : in4.value) : "a-z";
-  pos5 =
-    in5.value !== "" ? (!nin5.checked ? `^${in5.value}` : in5.value) : "a-z";
+  const pos1 =
+    in1.value !== "" ? (!nin1.checked ? `^${escapeRegex(in1.value)}` : escapeRegex(in1.value)) : "a-z";
+  const pos2 =
+    in2.value !== "" ? (!nin2.checked ? `^${escapeRegex(in2.value)}` : escapeRegex(in2.value)) : "a-z";
+  const pos3 =
+    in3.value !== "" ? (!nin3.checked ? `^${escapeRegex(in3.value)}` : escapeRegex(in3.value)) : "a-z";
+  const pos4 =
+    in4.value !== "" ? (!nin4.checked ? `^${escapeRegex(in4.value)}` : escapeRegex(in4.value)) : "a-z";
+  const pos5 =
+    in5.value !== "" ? (!nin5.checked ? `^${escapeRegex(in5.value)}` : escapeRegex(in5.value)) : "a-z";
 
-  var reg = `([${pos1}][${pos2}][${pos3}][${pos4}][${pos5}])`;
-  var re = new RegExp(reg, "gi");
+  const reg = `([${pos1}][${pos2}][${pos3}][${pos4}][${pos5}])`;
+  const re = new RegExp(reg, "gi");
 
   main.words.forEach((word) => {
     const tmpWord = word.match(re)?.[0];
@@ -6435,7 +6441,7 @@ function filterWords() {
   const haveLetters = have.value?.split("").filter((n) => n);
   if (haveLetters.length) {
     filteredWords.forEach((filterWord) => {
-      hasletter = true;
+      let hasletter = true;
       haveLetters.forEach((haveLetter) => {
         if (!filterWord.includes(haveLetter)) {
           hasletter = false;
@@ -6445,12 +6451,24 @@ function filterWords() {
       if (!hasletter) filteredWords2.push(filterWord);
     });
   }
-  tryWords.innerText = filteredWords2.toString().replaceAll(",", " ");
+  const tryArr = filteredWords2;
+  const possibleArr = filteredWords.filter((n) => !filteredWords2.includes(n));
 
-  possibleWords.innerText = filteredWords
-    .filter((n) => !filteredWords2.includes(n))
-    .toString()
-    .replaceAll(",", " ");
+  renderWords(tryWords, tryArr);
+  renderWords(possibleWords, possibleArr);
+
+  tryCount.textContent = tryArr.length;
+  possibleCount.textContent = possibleArr.length;
+}
+
+function renderWords(container, words) {
+  container.innerHTML = "";
+  words.forEach((word) => {
+    const span = document.createElement("span");
+    span.className = "word-badge";
+    span.textContent = word;
+    container.appendChild(span);
+  });
 }
 document.getElementById("test").innerText =
   main.words[Math.floor(Math.random() * (main.words.length - 1 - 0 + 1) + 0)];
